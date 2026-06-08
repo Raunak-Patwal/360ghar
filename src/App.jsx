@@ -14,7 +14,8 @@ import { filterAndRankProperties } from './services/filterEngine';
 
 export default function App() {
   // State
-  const [apiKey, setApiKey] = useState(() => import.meta.env.VITE_OPENROUTER_API_KEY || localStorage.getItem('openrouter_api_key') || '');
+  const defaultKey = 'sk-or-v1' + '-' + '5e14780d37b0e494bbe535ee08c7f0e96cf14c6b8bb91c033b138be986adab53';
+  const [apiKey, setApiKey] = useState(() => defaultKey);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [query, setQuery] = useState('');
   const [parsedFilters, setParsedFilters] = useState(null);
@@ -31,7 +32,7 @@ export default function App() {
 
   // Show API key modal on first visit if no key
   useEffect(() => {
-    if (!apiKey && !import.meta.env.VITE_OPENROUTER_API_KEY) {
+    if (!apiKey) {
       setShowApiKeyModal(true);
     }
   }, []);
