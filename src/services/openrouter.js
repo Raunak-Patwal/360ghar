@@ -4,7 +4,7 @@
  */
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const MODEL = 'google/gemma-2-9b-it:free';
+const MODEL = 'google/gemma-4-31b-it:free';
 
 /**
  * Make a call to OpenRouter API
