@@ -1451,16 +1451,16 @@ input, textarea { font-family: inherit; }
 }
 
 .compare-grid {
-  display: flex;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 0.4fr 1fr 1fr;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(6, auto);
+  gap: 8px 16px;
   width: 100%;
 }
 
 .compare-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: contents;
 }
 
 .labels-col {
@@ -1644,13 +1644,13 @@ input, textarea { font-family: inherit; }
   }
   
   .compare-grid {
+    grid-template-columns: 280px 280px;
     overflow-x: auto;
     padding-bottom: 24px;
     scroll-snap-type: x mandatory;
   }
   
-  .prop-col {
-    min-width: 280px;
+  .compare-cell {
     scroll-snap-align: center;
   }
   
