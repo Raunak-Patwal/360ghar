@@ -4,7 +4,7 @@
  */
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const MODEL = 'google/gemma-4-31b-it:free';
+const MODELS = ['google/gemma-4-31b-it:free', 'qwen/qwen-2-7b-instruct:free', 'openrouter/free'];
 
 /**
  * Make a call to OpenRouter API
@@ -24,7 +24,7 @@ async function callOpenRouter(messages, apiKey) {
         'X-Title': '360 Ghar - AI Property Search'
       },
       body: JSON.stringify({
-        model: MODEL,
+        models: MODELS,
         messages,
         temperature: 0.1,
         max_tokens: 1024
@@ -181,4 +181,4 @@ export async function validateApiKey(apiKey) {
   }
 }
 
-export { MODEL };
+export { MODELS };
