@@ -6,6 +6,12 @@
 
 ---
 
+## 🎥 Loom Screen Recording
+Watch the full end-to-end demo here:
+**[View Loom Video](https://www.loom.com/share/00a420dd50384e4a848fa22ee2648c8c)**
+
+---
+
 ## ✨ Features
 
 1. **Natural Language Search** — Type or speak queries like *"2BHK in Sector 50 under 80 lakhs, good sunlight, near a school"*
@@ -33,19 +39,17 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-**First Run**: The app will prompt you for an OpenRouter API key. Get one free (no credit card) at [openrouter.ai/keys](https://openrouter.ai/keys).
+**Note on API Key**: For seamless review, create a `.env` file in the root directory and add `VITE_OPENROUTER_API_KEY=your_key_here`. This will automatically inject the key and bypass the UI modal. You can get a free key at [openrouter.ai/keys](https://openrouter.ai/keys).
 
 ---
 
 ## 🤖 OpenRouter Model Choice
 
-**Model**: `openrouter/free`
+**Primary Model**: `google/gemma-4-31b-it:free`
+**Fallback Models**: `qwen/qwen-2-7b-instruct:free`, `openrouter/free`
 
-**Why openrouter/free?**
-- Automatically routes your request to whichever model is currently available and free.
-- Ensures the app never breaks due to a specific free model going offline or becoming paid.
-- Consistently good at instruction-following for structured JSON output.
-- 100% free with no credit card required.
+**Why this choice?**
+I selected `gemma-4-31b-it:free` as the primary model because it offers a high parameter count (31B), yielding excellent instruction-following capabilities crucial for strict JSON schema adherence and ambiguity detection. Since free APIs can be volatile, I implemented an OpenRouter fallback array (`models: [...]`) and a strict 20-second `AbortController` timeout. If the Gemma endpoint fails, it instantly routes to Qwen or an auto-router, ensuring zero UI crashes.
 
 ---
 
@@ -79,26 +83,11 @@ src/
 
 ## 🧠 Prompt Design Notes
 
-### Query Parsing Prompt
+**How I structured the LLM prompt:** I used a strict system prompt with explicit JSON schema definitions, field types, and a normalized vocabulary list for amenities/preferences. I also provided contextual Indian real-estate rules (e.g., 1 Crore = 100 Lakhs) and instructions to trigger a `followUpQuestion` if the user's intent is ambiguous.
 
-The parsing prompt was the most critical piece to get right. Here's what I learned:
+**What didn't work:** Initially, I didn't enforce a vocabulary list, which caused the LLM to output inconsistent terms (e.g., "pool" vs "swimming pool"), breaking the frontend matching engine. I also tried relying purely on the LLM for JSON formatting, but free models occasionally wrapped responses in markdown, forcing me to implement a robust regex extractor on the client side.
 
-1. **Explicit JSON schema in the system prompt** — I define the exact output format with field descriptions and types. This eliminates the most common failure mode (free-form text responses instead of JSON).
-
-2. **Normalization vocabulary** — The prompt includes exhaustive lists of valid amenity/preference/nearby-place values. This ensures the LLM maps colloquial terms ("good light" → "good sunlight", "near school" → nearbyPlaceType: "school") to values the filter engine understands.
-
-3. **Indian real-estate context** — I explicitly explain lakh/crore conversion, Gurgaon sector numbering, and BHK terminology. Without this, free models sometimes misinterpret "80 lakhs" as 80 or treat sectors as generic addresses.
-
-4. **Ambiguity detection** — The prompt instructs the model to set a `followUpQuestion` when the query is too vague (e.g., "flat in Gurgaon" with no budget/location). This makes the AI feel intelligent rather than just silently returning all results.
-
-5. **What didn't work**: Early attempts without the normalization lists led to inconsistent amenity names (e.g., "pool" vs "swimming pool" vs "swimming_pool"). Adding the explicit vocabulary list solved this completely. I also tried requesting markdown-wrapped JSON but found raw JSON with a JSON-extraction regex to be more reliable.
-
-### Summary Generation Prompt
-
-The summary prompt takes a different approach — it's conversational rather than structured. Key decisions:
-- Pass both the property details AND the original query so the model can draw direct connections
-- Instruct it NOT to start with "This property" to keep summaries varied and natural
-- Request exactly 2–3 sentences with specific match reasons — not generic marketing copy
+**Why I chose my model:** I opted for `google/gemma-4-31b-it:free` as the primary model for its superior reasoning and strict schema adherence. To combat the unreliability of free-tier APIs, I built a robust fallback array (falling back to Qwen) and a 20-second fetch timeout to guarantee a seamless UX.
 
 ---
 
